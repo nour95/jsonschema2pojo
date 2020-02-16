@@ -361,6 +361,7 @@ public class ObjectRule implements Rule<JPackage, JType> {
         toString.annotate(Override.class);
     }
 
+    //TODO
     private void addHashCode(JDefinedClass jclass, JsonNode node) {
         Map<String, JFieldVar> fields = removeFieldsExcludedFromEqualsAndHashCode(jclass.fields(), node);
 

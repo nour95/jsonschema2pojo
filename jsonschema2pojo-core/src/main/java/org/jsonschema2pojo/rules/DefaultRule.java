@@ -56,9 +56,24 @@ import scala.annotation.meta.field;
 public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
 
     private final RuleFactory ruleFactory;
+    private static int[] branchIDs = new int[12];
+
+    public DefaultRule(RuleFactory ruleFactory, int[] branchIDs)
+    {
+        this.ruleFactory = ruleFactory;
+        if (branchIDs == null || branchIDs.length == 0)
+            this.branchIDs = new int[12];
+        else
+            this.branchIDs = branchIDs;
+    }
 
     public DefaultRule(RuleFactory ruleFactory) {
+
         this.ruleFactory = ruleFactory;
+        //branchIDs = new int[]{0,0,0};
+
+        if (branchIDs == null || branchIDs.length == 0)
+            this.branchIDs = new int[12];
     }
 
     /**
@@ -84,25 +99,30 @@ public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
     @Override
     public JFieldVar apply(String nodeName, JsonNode node, JsonNode parent, JFieldVar field, Schema currentSchema) {
 
+        //TODO Complexity = 9
         boolean defaultPresent = node != null && isNotEmpty(node.asText());
 
         String fieldType = field.type().fullName();
 
         if (defaultPresent && !field.type().isPrimitive() && node.isNull()) {
+            System.out.println("Branch ID: D1");
             field.init(JExpr._null());
 
         } else if (fieldType.startsWith(List.class.getName())) {
+            System.out.println("Branch ID: D2");
             field.init(getDefaultList(field.type(), node));
 
         } else if (fieldType.startsWith(Set.class.getName())) {
+            System.out.println("Branch ID: D3");
             field.init(getDefaultSet(field.type(), node));
         } else if (fieldType.startsWith(String.class.getName()) && node != null ) {
+            System.out.println("Branch ID: D4");
             field.init(getDefaultValue(field.type(), node));
         } else if (defaultPresent) {
+            System.out.println("Branch ID: D5");
             field.init(getDefaultValue(field.type(), node));
 
         }
-
         return field;
     }
 
@@ -110,29 +130,50 @@ public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
         return getDefaultValue(fieldType, node.asText());
     }
 
-    static JExpression getDefaultValue(JType fieldType, String value) {
+    public int[] getIDlist()
+    {
+        return branchIDs;
+    }
 
+    public static void increaseAndPrint(int i)
+    {
+        branchIDs[i]++;
+        System.out.println("Branch ID: DG" + i);
+    }
+
+    //TODO> complexity = 16, and it is actully a public method (static)
+    static JExpression getDefaultValue(JType fieldType, String value)
+    {
+        //If this class is a wrapper type for a primitive, return the primitive type. Otherwise return this.
+        // For example, for "java.lang.Integer", this method returns "int".
         fieldType = fieldType.unboxify();
 
         if (fieldType.fullName().equals(String.class.getName())) {
+            increaseAndPrint(0);
             return JExpr.lit(value);
 
         } else if (fieldType.fullName().equals(int.class.getName())) {
+            increaseAndPrint(1);
             return JExpr.lit(Integer.parseInt(value));
 
         } else if (fieldType.fullName().equals(BigInteger.class.getName())) {
+            increaseAndPrint(2);
             return JExpr._new(fieldType).arg(JExpr.lit(value));
 
         } else if (fieldType.fullName().equals(double.class.getName())) {
+            increaseAndPrint(3);
             return JExpr.lit(Double.parseDouble(value));
 
         } else if (fieldType.fullName().equals(BigDecimal.class.getName())) {
+            increaseAndPrint(4);
             return JExpr._new(fieldType).arg(JExpr.lit(value));
 
         } else if (fieldType.fullName().equals(boolean.class.getName())) {
+            increaseAndPrint(5);
             return JExpr.lit(Boolean.parseBoolean(value));
 
         } else if (fieldType.fullName().equals(DateTime.class.getName()) || fieldType.fullName().equals(Date.class.getName())) {
+            increaseAndPrint(6);
             long millisecs = parseDateToMillisecs(value);
 
             JInvocation newDateTime = JExpr._new(fieldType);
@@ -141,26 +182,30 @@ public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
             return newDateTime;
 
         } else if (fieldType.fullName().equals(LocalDate.class.getName()) || fieldType.fullName().equals(LocalTime.class.getName())) {
-
+            increaseAndPrint(7);
             JInvocation stringParseableTypeInstance = JExpr._new(fieldType);
             stringParseableTypeInstance.arg(JExpr.lit(value));
             return stringParseableTypeInstance;
 
         } else if (fieldType.fullName().equals(long.class.getName())) {
+            increaseAndPrint(8);
             return JExpr.lit(Long.parseLong(value));
 
         } else if (fieldType.fullName().equals(float.class.getName())) {
+            increaseAndPrint(9);
             return JExpr.lit(Float.parseFloat(value));
 
         } else if (fieldType.fullName().equals(URI.class.getName())) {
+            increaseAndPrint(10);
             JInvocation invokeCreate = fieldType.owner().ref(URI.class).staticInvoke("create");
             return invokeCreate.arg(JExpr.lit(value));
 
         } else if (fieldType instanceof JDefinedClass && ((JDefinedClass) fieldType).getClassType().equals(ClassType.ENUM)) {
-
+            increaseAndPrint(11);
             return getDefaultEnum(fieldType, value);
 
         } else {
+            increaseAndPrint(12);
             return JExpr._null();
 
         }

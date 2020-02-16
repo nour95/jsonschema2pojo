@@ -90,23 +90,28 @@ public class AdditionalPropertiesRule implements Rule<JDefinedClass, JDefinedCla
 
         if (node != null && node.isBoolean() && node.asBoolean() == false) {
             // no additional properties allowed
+            System.out.println("Branch ID: A1");
             return jclass;
         }
 
         if (!this.ruleFactory.getGenerationConfig().isIncludeAdditionalProperties()) {
+            System.out.println("Branch ID: A2");
             // no additional properties allowed
             return jclass;
         }
 
         if (!ruleFactory.getAnnotator().isAdditionalPropertiesSupported()) {
+            System.out.println("Branch ID: A3");
             // schema allows additional properties, but serializer library can't support them
             return jclass;
         }
 
         JType propertyType;
         if (node != null && node.size() != 0) {
+            System.out.println("Branch ID: A4");
             propertyType = ruleFactory.getSchemaRule().apply(nodeName + "Property", node, parent, jclass, schema);
         } else {
+            System.out.println("Branch ID: A5");
             propertyType = jclass.owner().ref(Object.class);
         }
 
@@ -117,10 +122,12 @@ public class AdditionalPropertiesRule implements Rule<JDefinedClass, JDefinedCla
         addSetter(jclass, propertyType, field);
 
         if (ruleFactory.getGenerationConfig().isIncludeJsr303Annotations()) {
+            System.out.println("Branch ID: A6");
             ruleFactory.getValidRule().apply(nodeName, node, parent, field, schema);
         }
 
         if (ruleFactory.getGenerationConfig().isGenerateBuilders()) {
+            System.out.println("Branch ID: A7");
             addBuilder(jclass, propertyType, field);
         }
 
@@ -194,9 +201,9 @@ public class AdditionalPropertiesRule implements Rule<JDefinedClass, JDefinedCla
 
     private JMethod addInnerBuilder(JDefinedClass jclass, JType propertyType, JFieldVar field) {
         Optional<JDefinedClass> builderClass = StreamSupport
-            .stream(Spliterators.spliteratorUnknownSize(jclass.classes(), Spliterator.ORDERED), false)
-            .filter(definedClass -> definedClass.name().equals(getBuilderClassName(jclass)))
-            .findFirst();
+                .stream(Spliterators.spliteratorUnknownSize(jclass.classes(), Spliterator.ORDERED), false)
+                .filter(definedClass -> definedClass.name().equals(getBuilderClassName(jclass)))
+                .findFirst();
 
         JMethod builder = builderClass.get().method(JMod.PUBLIC, builderClass.get(), "withAdditionalProperty");
 

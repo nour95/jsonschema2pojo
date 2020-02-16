@@ -202,6 +202,12 @@
                 <artifactId>build-helper-maven-plugin</artifactId>
                 <version>1.12</version>
             </plugin>
+            <!-- I added this-->
+            <plugin>
+                <groupId>com.atlassian.maven.plugins</groupId>
+                <artifactId>clover-maven-plugin</artifactId>
+                <version>4.1.1</version>
+            </plugin>
         </plugins>
     </build>
 

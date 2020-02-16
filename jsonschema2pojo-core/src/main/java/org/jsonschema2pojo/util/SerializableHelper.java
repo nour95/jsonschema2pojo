@@ -93,6 +93,7 @@ public class SerializableHelper {
         }
     }
 
+    //TODO from 96 to 145
     private static void processDefinedClassForSerializableSupport(JDefinedClass jclass, DataOutputStream dataOutputStream) throws IOException {
         dataOutputStream.writeUTF(jclass.fullName());
         dataOutputStream.writeInt(jclass.mods().getValue());

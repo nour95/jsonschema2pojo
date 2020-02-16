@@ -29,7 +29,7 @@ public class Example {
     public static void main(String[] args) throws IOException {
 
         // BEGIN EXAMPLE
-
+        /*
         JCodeModel codeModel = new JCodeModel();
 
         URL source = Example.class.getResource("/schema/required.json");
@@ -45,7 +45,7 @@ public class Example {
         mapper.generate(codeModel, "ClassName", "com.example", source);
 
         codeModel.build(Files.createTempDirectory("required").toFile());
-
+*/
         // END EXAMPLE
 
     }

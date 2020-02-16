@@ -145,7 +145,7 @@ public class EnumRule implements Rule<JClassContainer, JType> {
         }
 
         addFieldAccessors(_enum, valueField);
-        addEnumConstants(enumDefinition, _enum, schema);
+        addEnumConstants(enumDefinition, _enum, schema); //TODO this function is the one that call the default class functions
         addFactoryMethod(enumDefinition, _enum);
 
         applyCustomizations(enumDefinition, _enum);
@@ -214,7 +214,7 @@ public class EnumRule implements Rule<JClassContainer, JType> {
      * @return the effective definition for enumeration
      */
     protected EnumDefinition buildEnumDefinition(String nodeName, JsonNode node, JType backingType) {
-
+        //.path() = get the field that has name enum
       JsonNode enums = node.path("enum");
       JsonNode javaEnumNames = node.path("javaEnumNames");
       JsonNode javaEnums = node.path("javaEnums");

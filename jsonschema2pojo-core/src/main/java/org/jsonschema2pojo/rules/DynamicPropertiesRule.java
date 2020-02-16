@@ -93,6 +93,7 @@ public class DynamicPropertiesRule implements Rule<JDefinedClass, JDefinedClass>
      */
     @Override
     public JDefinedClass apply(String nodeName, JsonNode node, JsonNode parent, JDefinedClass jclass, Schema currentSchema) {
+        //TODO complexitiy = 16
         if (!ruleFactory.getGenerationConfig().isIncludeDynamicAccessors() ||
                 (!ruleFactory.getGenerationConfig().isIncludeDynamicSetters() &&
                 !ruleFactory.getGenerationConfig().isIncludeDynamicGetters() &&

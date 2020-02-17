@@ -153,7 +153,7 @@ public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
             increaseAndPrint(0);
             return JExpr.lit(value);
 
-        } else if (fieldType.fullName().equals(int.class.getName())) { //TODO should be easy
+        } else if (fieldType.fullName().equals(int.class.getName())) { //TODO done
             increaseAndPrint(1);
             return JExpr.lit(Integer.parseInt(value));
 
@@ -161,7 +161,7 @@ public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
             increaseAndPrint(2);
             return JExpr._new(fieldType).arg(JExpr.lit(value));
 
-        } else if (fieldType.fullName().equals(double.class.getName())) {
+        } else if (fieldType.fullName().equals(double.class.getName())) { //
             increaseAndPrint(3);
             return JExpr.lit(Double.parseDouble(value));
 

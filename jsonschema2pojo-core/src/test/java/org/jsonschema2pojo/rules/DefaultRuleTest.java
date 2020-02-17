@@ -20,12 +20,19 @@ import static org.hamcrest.MatcherAssert.*;
 import static org.hamcrest.Matchers.*;
 import static org.mockito.Mockito.*;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URL;
+import java.nio.file.Files;
 
 import com.sun.codemodel.*;
-import org.jsonschema2pojo.GenerationConfig;
-import org.jsonschema2pojo.Schema;
+import org.jsonschema2pojo.*;
+import org.jsonschema2pojo.example.Example;
+import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -36,6 +43,9 @@ import com.fasterxml.jackson.databind.node.TextNode;
 
 public class DefaultRuleTest {
 
+
+    //https://stackoverflow.com/questions/25751758/how-to-assign-a-value-to-a-specific-index-of-an-array-with-java-codemodel
+
     private GenerationConfig config = mock(GenerationConfig.class);
     private RuleFactory ruleFactory = mock(RuleFactory.class);
 
@@ -44,6 +54,17 @@ public class DefaultRuleTest {
     @Before
     public void wireUpConfig() {
         when(ruleFactory.getGenerationConfig()).thenReturn(config);
+    }
+
+    @AfterClass
+    public static void runOnceAfterClass()
+    {
+        int[] branchIDs = DefaultRule.branchIDs;
+        System.out.println(branchIDs[0]);
+        System.out.println(branchIDs[1]);
+        System.out.println(branchIDs[2]);
+
+
     }
 
     @Test
@@ -82,7 +103,7 @@ public class DefaultRuleTest {
         assertThat(type.fullName(), is(String.class.getName()));*/
     }
 
-    @Test
+    @Test //TODO
     public void applyGeneratesDate() {
 
         JPackage jpackage = new JCodeModel()._package(getClass().getPackage().getName());
@@ -103,17 +124,104 @@ public class DefaultRuleTest {
         assertThat(result, equalTo(mockDateType));
     }
 
+
     @Test
-    public void applyGeneratesInteger() {
+    public void nourTest() throws Exception
+    {
+        JCodeModel codeModel = new JCodeModel();
+
+        //JClass mapClass = codeModel.ref(String.format("%s.%sMap", packageName, retrieve.getId()));
+
+        JDefinedClass retrieveClass = codeModel._class(JMod.PUBLIC, "Np", ClassType.CLASS);
+        retrieveClass.javadoc().append("Auto generated class. Do not modify!");
+        //retrieveClass._extends(codeModel.ref(AbstractRetrieve.class).narrow(mapClass));
+
+        // Constructor
+        //JMethod constructor = retrieveClass.constructor(JMod.PUBLIC);
+        //constructor.param(String.class, "id");
+        //constructor.body().invoke("super").arg(JExpr.ref("id"));
+
+        // Implemented method
+        /*JMethod getMapMethod = retrieveClass.method(JMod.PUBLIC, mapClass, "getMap");
+        getMapMethod.annotate(Override.class);
+        getMapMethod.param(codeModel.ref(Map.class).narrow(String.class, Object.class), "data");
+        getMapMethod.body()._return(JExpr._new(mapClass).arg(JExpr.ref("data")));*/
+
+
+        File target = new File("target/generated-sources/java");
+        if (!target.mkdirs()) {
+            throw new IOException("could not create directory");
+        }
+        codeModel.build(target);
+
+        //codeModel.build(f2);
+
+
+
+
+    }
+
+
+
+    @Test
+    public void applyGeneratesInteger() throws Exception //TODO fix exception
+    {
 
         JPackage jpackage = new JCodeModel()._package(getClass().getPackage().getName());
 
         ObjectNode objectNode = new ObjectMapper().createObjectNode();
         objectNode.put("type", "integer");
 
-        JType result = rule.apply("fooBar", objectNode, null, jpackage, null);
+        JType type = rule.apply("fooBar", objectNode, null, jpackage, null);
 
-        assertThat(result.fullName(), is(Integer.class.getName()));
+        JCodeModel codeModel = new JCodeModel();
+        JExpression ex = DefaultRule.getDefaultValue(type, "45");
+
+        //Not needed
+        //JBlock block = new JBlock();
+        //JVar jvar = block.decl(JMod.NONE, codeModel.parseType("int"), "numberToTest", ex);
+
+        JDefinedClass dClass = codeModel._class(JMod.PUBLIC, "Np", ClassType.CLASS);
+        JFieldVar fieldVar = dClass.field(JMod.PRIVATE, codeModel.parseType("int"), "numberToTest");
+        fieldVar.init(ex);
+        int m = fieldVar.mods().getValue();
+        File f = new File("teee.txt");
+        codeModel.build(f);
+        //String ssd = jvarIndex.equals();
+
+        //
+        //PrintWriter pw = new PrintWriter(new File("teee1.txt"));
+        //JFormatter formatter = new JFormatter(pw);
+        //String s = formatter.p("sd");
+
+        boolean correctType = ex instanceof  JExpressionImpl; //true
+        boolean correctType2 = ex instanceof JArray;
+        boolean correctType3 = ex instanceof JAssignment;
+        boolean correctType4 = ex instanceof JEnumConstant;
+        boolean correctType5 = ex instanceof JFieldRef;
+        boolean correctType6 = ex instanceof JInvocation;
+        boolean correctType7 = ex instanceof JStringLiteral;
+        boolean correctType8 = ex instanceof JVar;
+        //boolean correctType9 = ex instanceof JAtom;
+
+        JInvocation v = ex.invoke("45");
+        String v2 = v.toString();
+        //int ss = v.complement();
+
+        assertThat(ex instanceof JExpressionImpl, is(true));
+        assertThat(ex instanceof JStringLiteral, is(false));
+        assertThat(ex instanceof JVar, is(false));
+
+        if (ex instanceof JExpressionImpl)
+        {
+            JExpressionImpl ex1 = (JExpressionImpl) ex;
+            String b = ex1.toString();
+            System.out.println(ex1);
+            //assertThat(ex1.what, is("45"));
+
+        }
+
+        //assertThat(result.fullName(), is(Integer.class.getName()));
     }
 
     @Test

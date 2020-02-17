@@ -50,6 +50,8 @@ public class ConstructorRule implements Rule<JDefinedClass, JDefinedClass> {
 
   private final RuleFactory ruleFactory;
   private final ReflectionHelper reflectionHelper;
+  private static int[] branchIDs2 = new int[16];
+
 
   ConstructorRule(RuleFactory ruleFactory, ReflectionHelper reflectionHelper) {
     this.ruleFactory = ruleFactory;
@@ -167,6 +169,12 @@ public class ConstructorRule implements Rule<JDefinedClass, JDefinedClass> {
     }
   }
 
+  private void increaseAndPrint(int i)
+  {
+    branchIDs2[i]++;
+    System.out.println("Branch ID: CP" + i);
+  }
+
   /**
    * Retrieve the list of properties to go in the constructor from node. This is all properties listed in node["properties"] if ! onlyRequired, and
    * only required properties if onlyRequired.
@@ -174,42 +182,75 @@ public class ConstructorRule implements Rule<JDefinedClass, JDefinedClass> {
   private LinkedHashSet<String> getConstructorProperties(JsonNode node, boolean onlyRequired) {
 
     if (!node.has("properties")) {
+      increaseAndPrint(0);
       return new LinkedHashSet<>();
     }
+    else
+      increaseAndPrint(10);
+
 
     LinkedHashSet<String> rtn = new LinkedHashSet<>();
     Set<String> draft4RequiredProperties = new HashSet<>();
 
     // setup the set of required properties for draft4 style "required"
-    if (onlyRequired && node.has("required")) {
+    if (onlyRequired && node.has("required"))
+    {
+      increaseAndPrint(1);
+
       JsonNode requiredArray = node.get("required");
-      if (requiredArray.isArray()) {
-        for (JsonNode requiredEntry : requiredArray) {
-          if (requiredEntry.isTextual()) {
+      if (requiredArray.isArray())
+      {
+        increaseAndPrint(2);
+
+        for (JsonNode requiredEntry : requiredArray)
+        {
+          if (requiredEntry.isTextual())
+          {
+            increaseAndPrint(3);
             draft4RequiredProperties.add(requiredEntry.asText());
           }
+          else
+            increaseAndPrint(13);
         }
       }
+      else
+        increaseAndPrint(12);
     }
+    else
+      increaseAndPrint(11);
 
     NameHelper nameHelper = ruleFactory.getNameHelper();
     for (Iterator<Entry<String, JsonNode>> properties = node.get("properties")
-        .fields(); properties.hasNext(); ) {
+        .fields(); properties.hasNext(); )
+    {
       Map.Entry<String, JsonNode> property = properties.next();
 
       JsonNode propertyObj = property.getValue();
-      if (onlyRequired) {
+      if (onlyRequired)
+      {
+        increaseAndPrint(4);
         // draft3 style
         if (propertyObj.has("required") && propertyObj.get("required")
-            .asBoolean()) {
+            .asBoolean())
+        {
+          increaseAndPrint(5);
           rtn.add(nameHelper.getPropertyName(property.getKey(), property.getValue()));
         }
+        else
+          increaseAndPrint(15);
+
 
         // draft4 style
         if (draft4RequiredProperties.contains(property.getKey())) {
+          increaseAndPrint(6);
           rtn.add(nameHelper.getPropertyName(property.getKey(), property.getValue()));
         }
+        else
+          increaseAndPrint(16);
+
+
       } else {
+        increaseAndPrint(14);
         rtn.add(nameHelper.getPropertyName(property.getKey(), property.getValue()));
       }
     }

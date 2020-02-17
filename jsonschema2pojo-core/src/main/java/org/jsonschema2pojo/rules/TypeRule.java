@@ -41,7 +41,7 @@ public class TypeRule implements Rule<JClassContainer, JType> {
 
   private final RuleFactory ruleFactory;
 
-  protected TypeRule(RuleFactory ruleFactory) {
+  public TypeRule(RuleFactory ruleFactory) {
     this.ruleFactory = ruleFactory;
   }
 

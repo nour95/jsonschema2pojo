@@ -56,7 +56,7 @@ import scala.annotation.meta.field;
 public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
 
     private final RuleFactory ruleFactory;
-    private static int[] branchIDs = new int[12];
+    public static int[] branchIDs = new int[12];
 
     public DefaultRule(RuleFactory ruleFactory, int[] branchIDs)
     {
@@ -142,17 +142,18 @@ public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
     }
 
     //TODO> complexity = 16, and it is actully a public method (static)
-    static JExpression getDefaultValue(JType fieldType, String value)
+    //    static JExpression getDefaultValue(JType fieldType, String value)
+    public static JExpression getDefaultValue(JType fieldType, String value)
     {
         //If this class is a wrapper type for a primitive, return the primitive type. Otherwise return this.
         // For example, for "java.lang.Integer", this method returns "int".
         fieldType = fieldType.unboxify();
 
-        if (fieldType.fullName().equals(String.class.getName())) {
+        if (fieldType.fullName().equals(String.class.getName())) { //TODO done
             increaseAndPrint(0);
             return JExpr.lit(value);
 
-        } else if (fieldType.fullName().equals(int.class.getName())) {
+        } else if (fieldType.fullName().equals(int.class.getName())) { //TODO should be easy
             increaseAndPrint(1);
             return JExpr.lit(Integer.parseInt(value));
 

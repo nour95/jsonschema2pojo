@@ -149,32 +149,32 @@ public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
         // For example, for "java.lang.Integer", this method returns "int".
         fieldType = fieldType.unboxify();
 
-        if (fieldType.fullName().equals(String.class.getName())) { //TODO done
+        if (fieldType.fullName().equals(String.class.getName())) { //TODO done string
             increaseAndPrint(0);
             return JExpr.lit(value);
 
-        } else if (fieldType.fullName().equals(int.class.getName())) { //TODO done
+        } else if (fieldType.fullName().equals(int.class.getName())) { //TODO done int
             increaseAndPrint(1);
             return JExpr.lit(Integer.parseInt(value));
 
-        } else if (fieldType.fullName().equals(BigInteger.class.getName())) {
+        } else if (fieldType.fullName().equals(BigInteger.class.getName())) { //TODO done bigInt
             increaseAndPrint(2);
             return JExpr._new(fieldType).arg(JExpr.lit(value));
 
-        } else if (fieldType.fullName().equals(double.class.getName())) { //
+        } else if (fieldType.fullName().equals(double.class.getName())) { //TODO done double
             increaseAndPrint(3);
             return JExpr.lit(Double.parseDouble(value));
 
-        } else if (fieldType.fullName().equals(BigDecimal.class.getName())) {
+        } else if (fieldType.fullName().equals(BigDecimal.class.getName())) {  //TODO done bigDec
             increaseAndPrint(4);
             return JExpr._new(fieldType).arg(JExpr.lit(value));
 
-        } else if (fieldType.fullName().equals(boolean.class.getName())) {
+        } else if (fieldType.fullName().equals(boolean.class.getName())) { //TODO done boolean
             increaseAndPrint(5);
             return JExpr.lit(Boolean.parseBoolean(value));
 
         } else if (fieldType.fullName().equals(DateTime.class.getName()) || fieldType.fullName().equals(Date.class.getName())) {
-            increaseAndPrint(6);
+            increaseAndPrint(6);                            //TODO done date/ dateTime
             long millisecs = parseDateToMillisecs(value);
 
             JInvocation newDateTime = JExpr._new(fieldType);
@@ -183,16 +183,16 @@ public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
             return newDateTime;
 
         } else if (fieldType.fullName().equals(LocalDate.class.getName()) || fieldType.fullName().equals(LocalTime.class.getName())) {
-            increaseAndPrint(7);
+            increaseAndPrint(7);                                   //TODO done localTime and localDate
             JInvocation stringParseableTypeInstance = JExpr._new(fieldType);
             stringParseableTypeInstance.arg(JExpr.lit(value));
             return stringParseableTypeInstance;
 
-        } else if (fieldType.fullName().equals(long.class.getName())) {
+        } else if (fieldType.fullName().equals(long.class.getName())) { //TODO done long
             increaseAndPrint(8);
             return JExpr.lit(Long.parseLong(value));
 
-        } else if (fieldType.fullName().equals(float.class.getName())) {
+        } else if (fieldType.fullName().equals(float.class.getName())) { //TODO done float
             increaseAndPrint(9);
             return JExpr.lit(Float.parseFloat(value));
 

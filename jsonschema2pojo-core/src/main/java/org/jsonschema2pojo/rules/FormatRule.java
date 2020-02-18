@@ -94,7 +94,10 @@ public class FormatRule implements Rule<JType, JType> {
     @Override
     public JType apply(String nodeName, JsonNode node, JsonNode parent, JType baseType, Schema schema) {
 
+        String s = node.asText();
+        String d = nodeName;
         Class<?> type = getType(node.asText());
+
         if (type != null) {
             JType jtype = baseType.owner().ref(type);
             if (ruleFactory.getGenerationConfig().isUsePrimitives()) {

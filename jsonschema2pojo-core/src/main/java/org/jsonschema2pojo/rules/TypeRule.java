@@ -81,7 +81,8 @@ public class TypeRule implements Rule<JClassContainer, JType> {
     if (propertyTypeName.equals("object") || node.has("properties") && node.path("properties").size() > 0) {
 
       type = ruleFactory.getObjectRule().apply(nodeName, node, parent, jClassContainer.getPackage(), schema);
-    } else if (node.has("existingJavaType")) {
+    }
+    else if (node.has("existingJavaType")) {
       String typeName = node.path("existingJavaType").asText();
 
       if (isPrimitive(typeName, jClassContainer.owner())) {

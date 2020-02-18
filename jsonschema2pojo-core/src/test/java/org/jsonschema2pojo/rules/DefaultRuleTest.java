@@ -23,27 +23,37 @@ import static org.mockito.Mockito.*;
 import java.io.*;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.text.ParseException;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import org.joda.time.LocalDate;
 import org.joda.time.LocalTime;
 import java.util.Date;
+import java.net.URI;
 
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.sun.codemodel.*;
 import org.joda.time.DateTime;
 import org.jsonschema2pojo.*;
 import org.jsonschema2pojo.example.Example;
+import org.jsonschema2pojo.exception.ClassAlreadyExistsException;
+import org.jsonschema2pojo.util.NameHelper;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class DefaultRuleTest {
 
@@ -480,6 +490,212 @@ public class DefaultRuleTest {
         assertThat(expIsSavedCorrectly, is( true ));
 
 
+    }
+
+    @Test
+    public void getDefaultValueURI() throws URISyntaxException {
+        String varName = "numberToTest";
+        String typeName = "URI";
+
+        String uriBase = "https://www.geeksforgeeks.org/";
+        URI uri = new URI(uriBase);
+
+        boolean expIsSavedCorrectly = false;
+
+        JCodeModel codeModel = new JCodeModel();
+        when(config.isUseJodaLocalDates()).thenReturn(true);
+
+        JType type = generateJType("string", "uri");
+
+        JExpression ex = DefaultRule.getDefaultValue(type, "" + uri);
+
+        try {
+
+            generateJField(codeModel, typeName, varName, ex);
+
+            File target = new File(path);
+            codeModel.build(target);
+
+            String dataNeeded = "private " + typeName + " " + varName + " = java.net.URI.create(\"" + uri + "\");";
+            expIsSavedCorrectly = fileContains(className, dataNeeded);
+
+        }
+        catch (JClassAlreadyExistsException | IOException | ClassNotFoundException e ) {
+            System.out.println(e);
+        }
+
+        assertThat(expIsSavedCorrectly, is( true ));
+    }
+
+    private static class FirstArgAnswer<T> implements Answer<T> {
+        @SuppressWarnings("unchecked")
+        @Override
+        public T answer(InvocationOnMock invocation) {
+            Object[] args = invocation.getArguments();
+            //noinspection unchecked
+            return (T) args[0];
+        }
+    }
+
+    @Test
+    public void nourTest()
+    {
+        EnumRule rule2 = new EnumRule(ruleFactory);
+        TypeRule typeRule = mock(TypeRule.class);
+        Schema schema = mock(Schema.class);
+
+
+        Answer<String> firstArgAnswer = new EnumRuleTest.FirstArgAnswer<>();
+
+        NameHelper nameHelper = mock(NameHelper.class);
+        Annotator annotator = mock(Annotator.class);
+        //RuleLogger logger = mock(RuleLogger.class);
+
+        when(nameHelper.getClassName(anyString(), Matchers.any(JsonNode.class))).thenAnswer(firstArgAnswer);
+        when(nameHelper.replaceIllegalCharacters(anyString())).thenAnswer(firstArgAnswer);
+        when(nameHelper.normalizeName(anyString())).thenAnswer(firstArgAnswer);
+
+        JPackage jpackage = new JCodeModel()._package(getClass().getPackage().getName());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        //ArrayNode arrayNode = objectMapper.createArrayNode();
+        //arrayNode.add("open");
+        //arrayNode.add("closed");
+        ObjectNode enumNode = objectMapper.createObjectNode();
+        enumNode.put("type", "string");
+        //enumNode.set("enum", arrayNode);
+
+
+        // We're always a string for the purposes of this test
+        when(typeRule.apply("status", enumNode, null, jpackage, schema))
+                .thenReturn(jpackage.owner()._ref(String.class));
+        when(ruleFactory.getNameHelper()).thenReturn(nameHelper);
+        //when(ruleFactory.getLogger()).thenReturn(logger);
+        when(ruleFactory.getAnnotator()).thenReturn(annotator);
+        when(ruleFactory.getTypeRule()).thenReturn(typeRule);
+
+
+        JType type = rule2.apply("status", enumNode, null, jpackage, schema);
+
+        boolean c = type instanceof JDefinedClass;
+        ClassType d = ((JDefinedClass) type).getClassType(); //.equals(ClassType.ENUM);
+        ClassType e = ClassType.ENUM;
+        assertThat(d, is(e));
+        System.out.println(d);
+
+        JExpression ex = DefaultRule.getDefaultValue(type, "");
+
+        JCodeModel codeModel = new JCodeModel();
+        //codeModel.
+
+        String s = ((JDefinedClass) ex).name();
+        System.out.println("Happy "+ s);
+        //File target = new File(path);
+        //codeModel.build(target);
+
+
+
+    }
+
+
+    @Test
+    public void nourTest2() {
+        EnumRule rule2 = new EnumRule(ruleFactory);
+
+
+        String varName = "numberToTest";
+        String typeName = "EJa";
+
+        boolean expIsSavedCorrectly = false;
+
+        try {
+
+            JCodeModel codeModel = new JCodeModel();
+            //JDefinedClass dClass = codeModel._class(JMod.PUBLIC, "JavaEnum", ClassType.ENUM);
+            //JType type = dClass;
+
+            JPackage jpackage = new JCodeModel()._package(getClass().getPackage().getName());
+
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode enumNode = objectMapper.createObjectNode();
+            enumNode.put("type", "string");
+
+            JDefinedClass sd = rule2.createEnum(enumNode, "EJa", jpackage);
+
+            //JDefinedClass defineClass = owner.defineClass(t, ClassType.ENUM)
+
+            //boolean c = type instanceof JDefinedClass;
+            //ClassType d = ((JDefinedClass) type).getClassType(); //.equals(ClassType.ENUM);
+            ClassType dd = sd.getClassType();
+            ClassType e = ClassType.ENUM;
+
+            JExpression ex = DefaultRule.getDefaultValue(sd, "");
+            generateJField(codeModel, typeName, varName, ex);
+
+            String s = ((JDefinedClass) ex).name();
+            System.out.println("Happy "+ s);
+
+            File target = new File(path);
+            codeModel.build(target);
+
+            //String dataNeeded = "private " + typeName + " " + varName + " = java.net.URI.create(\"" + uri + "\");";
+            //expIsSavedCorrectly = fileContains("JavaEnum", dataNeeded);
+
+        }
+        catch (JClassAlreadyExistsException | IOException | ClassNotFoundException | ClassAlreadyExistsException e ) {
+            System.out.println(e);
+        }
+
+        //assertThat(expIsSavedCorrectly, is( true ));
+    }
+
+    @Test
+    public void getDefaultValueEnum() {
+        String varName = "numberToTest";
+        String typeName = "URI";
+
+        boolean expIsSavedCorrectly = false;
+
+        try {
+
+            JCodeModel codeModel = new JCodeModel();
+            JDefinedClass dClass = codeModel._class(JMod.PUBLIC, "JavaEnum", ClassType.ENUM);
+            JType type = dClass;
+
+            //JDefinedClass defineClass = owner.defineClass(t, ClassType.ENUM)
+
+            boolean c = type instanceof JDefinedClass;
+            ClassType d = ((JDefinedClass) type).getClassType(); //.equals(ClassType.ENUM);
+            ClassType e = ClassType.ENUM;
+
+            JExpression ex = DefaultRule.getDefaultValue(type, "");
+            generateJField(codeModel, typeName, varName, ex);
+
+            File target = new File(path);
+            codeModel.build(target);
+
+            //String dataNeeded = "private " + typeName + " " + varName + " = java.net.URI.create(\"" + uri + "\");";
+            //expIsSavedCorrectly = fileContains("JavaEnum", dataNeeded);
+
+        }
+        catch (JClassAlreadyExistsException | IOException | ClassNotFoundException e ) {
+            System.out.println(e);
+        }
+
+        //assertThat(expIsSavedCorrectly, is( true ));
+    }
+
+
+    @Test
+    public void getDefaultValueNull()
+    {
+        JPackage jpackage = new JCodeModel()._package(getClass().getPackage().getName());
+        ObjectNode objectNode = new ObjectMapper().createObjectNode();
+        objectNode.put("type", "Person");
+        JType type = rule.apply("fooBar", objectNode, null, jpackage, null);
+
+        JExpression ex = DefaultRule.getDefaultValue(type, "");
+        assertThat(ex, is(JExpr._null()));
     }
 
 

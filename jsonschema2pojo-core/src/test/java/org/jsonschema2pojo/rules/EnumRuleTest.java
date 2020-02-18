@@ -80,13 +80,14 @@ public class EnumRuleTest {
         .thenReturn(jpackage.owner()._ref(String.class));
 
         JType result1 = rule.apply("status", enumNode, null, jpackage, schema);
+
         JType result2 = rule.apply("status", enumNode, null, jpackage, schema);
 
         assertThat(result1.fullName(), is("org.jsonschema2pojo.rules.Status"));
         assertThat(result2.fullName(), is("org.jsonschema2pojo.rules.Status_"));
     }
 
-    private static class FirstArgAnswer<T> implements Answer<T> {
+    static class FirstArgAnswer<T> implements Answer<T> {
         @SuppressWarnings("unchecked")
         @Override
         public T answer(InvocationOnMock invocation) {

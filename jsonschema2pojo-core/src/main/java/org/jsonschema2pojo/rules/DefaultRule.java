@@ -56,7 +56,7 @@ import scala.annotation.meta.field;
 public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
 
     private final RuleFactory ruleFactory;
-    public static int[] branchIDs = new int[12];
+    public static int[] branchIDs = new int[13];
 
     public DefaultRule(RuleFactory ruleFactory, int[] branchIDs)
     {
@@ -196,7 +196,7 @@ public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
             increaseAndPrint(9);
             return JExpr.lit(Float.parseFloat(value));
 
-        } else if (fieldType.fullName().equals(URI.class.getName())) {
+        } else if (fieldType.fullName().equals(URI.class.getName())) {  //TODO done URI
             increaseAndPrint(10);
             JInvocation invokeCreate = fieldType.owner().ref(URI.class).staticInvoke("create");
             return invokeCreate.arg(JExpr.lit(value));
@@ -205,7 +205,7 @@ public class DefaultRule implements Rule<JFieldVar, JFieldVar> {
             increaseAndPrint(11);
             return getDefaultEnum(fieldType, value);
 
-        } else {
+        } else {                                //TODO done empty
             increaseAndPrint(12);
             return JExpr._null();
 
